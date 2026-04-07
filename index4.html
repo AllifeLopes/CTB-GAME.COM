@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CTB GAME</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+      background: radial-gradient(circle, #1a1a1a, #000);
+      height: 100vh;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* PORTÕES */
+    .gate {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(to bottom, #8f8f8f, #4a4a4a);
+      z-index: 5;
+    }
+
+    .left-gate {
+      left: 0;
+      animation: openLeft 2s forwards;
+      animation-delay: 1s;
+    }
+
+    .right-gate {
+      right: 0;
+      animation: openRight 2s forwards;
+      animation-delay: 1s;
+    }
+
+    @keyframes openLeft {
+      to {
+        transform: translateX(-100%);
+      }
+    }
+
+    @keyframes openRight {
+      to {
+        transform: translateX(100%);
+      }
+    }
+
+    /* LOGO */
+    .logo-wrap {
+      position: absolute;
+      top: 38%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
+      text-align: center;
+      z-index: 3;
+      animation: aparecer 1.5s forwards;
+      animation-delay: 2.5s;
+      width: 100%;
+      padding: 0 16px;
+    }
+
+    @keyframes aparecer {
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .logo {
+      width: min(400px, 80vw);
+      max-width: 100%;
+      filter: drop-shadow(0 0 20px gold);
+    }
+
+    .title {
+      color: gold;
+      font-size: 28px;
+      margin-top: 10px;
+      letter-spacing: 3px;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    }
+
+    /* HUD JOGADORES */
+    .players-hud {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 10;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid gold;
+      color: gold;
+      font-weight: bold;
+      font-size: 13px;
+      min-width: 180px;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+    }
+
+    .flag-br {
+      margin-top: 8px;
+    }
+
+    .flag-slot {
+      width: 28px;
+      height: 20px;
+      border: 1px dashed rgba(255,255,255,0.5);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ddd;
+      font-size: 10px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* PAINEL LOGIN / CADASTRO */
+    .auth-panel {
+      position: absolute;
+      top: auto;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+
+      width: 90%;
+      max-width: 350px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.70);
+      border: 1px solid rgba(255, 215, 0, 0.7);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.12);
+      backdrop-filter: blur(5px);
+    }
+
+    .auth-title {
+      color: gold;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid rgba(255, 215, 0, 0.55);
+      background: rgba(255,255,255,0.04);
+      color: #f3d46a;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.25s;
+    }
+
+    .tab-btn:hover {
+      transform: scale(1.02);
+      background: rgba(255,215,0,0.08);
+    }
+
+    .tab-btn.active {
+      background: gold;
+      color: #111;
+    }
+
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .auth-form.active {
+      display: flex;
+    }
+
+    .auth-form input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      outline: none;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 14px;
+    }
+
+    .auth-form input::placeholder {
+      color: #cfcfcf;
+    }
+
+    .auth-form button {
+      padding: 11px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #ffd700, #ffb300);
+      color: #111;
+      font-weight: bold;
+      font-size: 14px;
+      transition: 0.25s;
+    }
+
+    .auth-form button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+    }
+
+    .status-msg {
+      margin-top: 10px;
+      color: #e8e8e8;
+      font-size: 12px;
+      min-height: 18px;
+      text-align: center;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 600px) {
+      .logo-wrap {
+        top: 34%;
+      }
+
+      .logo {
+        width: 70vw;
+      }
+
+      .title {
+        font-size: 20px;
+        letter-spacing: 2px;
+      }
+
+      .auth-panel {
+        bottom: 10px;
+        width: 95%;
+        padding: 12px;
+      }
+
+      .players-hud {
+        top: 10px;
+        left: 10px;
+        font-size: 11px;
+        padding: 8px 10px;
+        min-width: 150px;
+      }
+
+      .flag-slot {
+        width: 24px;
+        height: 18px;
+        font-size: 9px;
+      }
+
+      .auth-title {
+        font-size: 16px;
+      }
+
+      .auth-form input,
+      .auth-form button,
+      .tab-btn {
+        font-size: 13px;
+        padding: 10px;
+      }
+    }
+
+    @media (max-height: 700px) {
+      .logo-wrap {
+        top: 30%;
+      }
+
+      .logo {
+        width: min(280px, 65vw);
+      }
+
+      .title {
+        font-size: 18px;
+      }
+
+      .auth-panel {
+        bottom: 8px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene">
+
+    <!-- HUD JOGADORES -->
+    <div class="players-hud">
+      👥 Jogadores ativos: <span id="players">128</span>
+
+      <div class="flag-br">
+        <!-- COLOQUE SUA BANDEIRA AQUI -->
+        <!-- Exemplo: <img src="brasil.png" width="28"> -->
+        <div class="flag-slot">brasil.png</div>
+      </div>
+    </div>
+
+    <!-- PAINEL DE LOGIN / CADASTRO -->
+    <div class="auth-panel">
+      <div class="auth-title">ÁREA DO JOGADOR</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="mostrarAba('login')">Login</button>
+        <button class="tab-btn" onclick="mostrarAba('cadastro')">Cadastrar</button>
+      </div>
+
+      <form class="auth-form active" id="form-login" onsubmit="fazerLogin(event)">
+        <input type="text" id="login-usuario" placeholder="Nome do jogador" required>
+        <input type="password" id="login-senha" placeholder="Senha" required>
+        <button type="submit">Entrar no jogo</button>
+      </form>
+
+      <form class="auth-form" id="form-cadastro" onsubmit="cadastrarJogador(event)">
+        <input type="text" id="cadastro-usuario" placeholder="Crie seu nome de jogador" required>
+        <input type="email" id="cadastro-email" placeholder="Seu e-mail" required>
+        <input type="password" id="cadastro-senha" placeholder="Crie sua senha" required>
+        <button type="submit">Cadastrar jogador</button>
+      </form>
+
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+
+    <!-- PORTÕES -->
+    <div class="gate left-gate"></div>
+    <div class="gate right-gate"></div>
+
+    <!-- LOGO -->
+    <div class="logo-wrap">
+      <img src="logo.ctb.png" alt="Logo CTB" class="logo">
+      <div class="title">CTB GAME</div>
+    </div>
+
+  </div>
+
+  <script>
+    const players = document.getElementById("players");
+    const statusMsg = document.getElementById("status-msg");
+    const tabs = document.querySelectorAll(".tab-btn");
+    const formLogin = document.getElementById("form-login");
+    const formCadastro = document.getElementById("form-cadastro");
+
+    setInterval(() => {
+      let valor = parseInt(players.innerText);
+      let variacao = Math.floor(Math.random() * 5) - 2;
+
+      valor += variacao;
+
+      if (valor < 100) valor = 100;
+      if (valor > 999) valor = 999;
+
+      players.innerText = valor;
+    }, 2000);
+
+    function mostrarAba(tipo) {
+      tabs.forEach(btn => btn.classList.remove("active"));
+
+      if (tipo === "login") {
+        tabs[0].classList.add("active");
+        formLogin.classList.add("active");
+        formCadastro.classList.remove("active");
+      } else {
+        tabs[1].classList.add("active");
+        formCadastro.classList.add("active");
+        formLogin.classList.remove("active");
+      }
+
+      statusMsg.innerText = "";
+    }
+
+    function cadastrarJogador(event) {
+      event.preventDefault();
+
+      const usuario = document.getElementById("cadastro-usuario").value;
+      const email = document.getElementById("cadastro-email").value;
+      const senha = document.getElementById("cadastro-senha").value;
+
+      const jogador = {
+        usuario,
+        email,
+        senha
+      };
+
+      localStorage.setItem("ctb_jogador_" + usuario, JSON.stringify(jogador));
+      statusMsg.innerText = "Jogador cadastrado com sucesso.";
+      formCadastro.reset();
+    }
+
+    function fazerLogin(event) {
+      event.preventDefault();
+
+      const usuario = document.getElementById("login-usuario").value;
+      const senha = document.getElementById("login-senha").value;
+
+      const dados = localStorage.getItem("ctb_jogador_" + usuario);
+
+      if (!dados) {
+        statusMsg.innerText = "Jogador não encontrado.";
+        return;
+      }
+
+      const jogador = JSON.parse(dados);
+
+      if (jogador.senha === senha) {
+        statusMsg.innerText = "Login realizado com sucesso. Bem-vindo, " + usuario + "!";
+      } else {
+        statusMsg.innerText = "Senha incorreta.";
+      }
+    }
+  </script>
+
+</body>
+</html>

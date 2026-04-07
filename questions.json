@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "pergunta": "Dirigir sem possuir CNH é infração:",
+    "alternativas": {
+      "A": "Leve",
+      "B": "Média",
+      "C": "Grave",
+      "D": "Gravíssima"
+    },
+    "correta": "D",
+    "explicacao": "Dirigir sem possuir CNH é infração gravíssima."
+  }
+]
